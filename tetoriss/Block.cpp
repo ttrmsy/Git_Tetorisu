@@ -11,7 +11,7 @@
 #define BLOCK_SIZE       (36)   //１ブロック当たりのサイズ
 #define BLOCK_TYPE_MAX   (7)    //落ちてくるブロックの種類
 #define BLOCK_NEXT_POS_X   (700)  //次のブロックの座標(X座標)
-#define BLOCK_ NEXT_POS_Y  (500)  //次のブロックの座標(Y座標)
+#define BLOCK_NEXT_POS_Y  (500)  //次のブロックの座標(Y座標)
 #define BLOCK_STOCK_POS_X  (500)  //ストックされたブロックの座標(X座標)
 #define BLOCK_STOCK_POS_Y  (350)  //ストックされてブロックの座標(Y座標)
 #define DROP_BLOCK_INIT_X  (4)    //落ちてくるブロックの初期X座標
@@ -99,7 +99,7 @@ int DropBlock_Y;        //落ちるブロックのｙ座標
 
 
 int WaitTime;    //待機時間
-int Stock_flg;    //ストックフラグ
+int Stock_Flg;    //ストックフラグ
 int Generate_Flg;     //生成フラグ
 int DeleteLine;     //消したラインの数
 int SoundEffect[3];  //SE
@@ -114,7 +114,7 @@ void change_block(void);      //ストック交換処理
 void turn_block(int clockwise);   //ブロック回転処理
 int check_overlap(int x, int y);  //範囲外チェック処理
 void lock_block(int x, int y);    //着地したブロックを固定済みに変更する処理
-void checj_line(void);             //ブロックの横一列確認処理
+void check_line(void);             //ブロックの横一列確認処理
 
 /*****************************
 *ブロック機能：初期化処理
@@ -147,5 +147,165 @@ int Block_Initialize(void)
 	//ブロック生成
 	create_block();
 	create_block();
+
+	//待機時間の初期化
+	WaitTime = 0;
+	//ストックフラグの初期化
+	Stock_Flg = FALSE;
+	//生成フラグの初期化
+	Generate_Flg = TRUE;
+	//消したラインの数の初期化
+	DeleteLine = 0;
+
+	//エラーチェック
+	for (i = 0; i < 3; i++)
+	{
+		if (SoundEffect[i] == -1)
+		{
+			ret = -1;
+			break;
+		}
+	}
+	return ret;
 }
+
+/*********************************
+*ブロック機能:更新処理
+* 引数:なし
+* 戻り値:なし
+**********************************/
+void Block_Update(void)
+{
+	//ブロックの移動処理
+	move_block();
+
+	//ブロックのストック
+	if ((GetButtonDown(XINPUT_BUTTON_LEFT_SHOULDER) == TRUE) ||
+		(GetButtonDown(XINPUT_BUTTON_RIGHT_SHOULDER) == TRUE))
+	{
+		//生成可能であれば
+		if (Generate_Flg == TRUE)
+		{
+			change_block();//ストック交換処理
+			//ブロックの回転を正位置にする
+		}
+
+	}
+
+	//ブロックの回転（反時計回り）
+	if ((GetButtonDown(XINPUT_BUTTON_A) == TRUE) ||
+		(GetButtonDown(XINPUT_BUTTON_Y) == TRUE))
+	{
+		turn_block(TURN_ANTICROCKWICE);
+	}
+	//ブロックの回転(時計回り)
+	if ((GetButtonDown(XINPUT_BUTTON_B) == TRUE) ||
+		(GetButtonDown(XINPUT_BUTTON_X) == TRUE))
+	{
+		turn_block(TURN_CROCKWICE);
+	}
+
+	//落下処理
+	WaitTime++;   //カウンタの更新
+	if (WaitTime > DROP_SPEED)
+	{
+		if (check_overlap(DropBlock_X, DropBlock_Y + 1) == TRUE)
+		{
+			DropBlock_Y++;
+		}
+		else
+		{
+			//ブロックの固定
+			lock_block(DropBlock_X, DropBlock_Y);
+			//ブロックの消去とブロックを下す処理
+			check_line();
+			//新しいブロックの生成
+			create_block();
+		}
+		//カウンタの初期化
+		WaitTime = 0;
+	}
+}
+
+/*************************************
+*ブロック機能：描画処理
+* 引数：なし
+* 戻り値：なし
+**************************************/
+void Block_Draw(void)
+{
+	int i, j;          //ループカウンタ
+
+	//フィールドのブロックを描画
+	for (i = 0; i < FIELD_HEIGHT; i++)
+	{
+		for (j = 0; j < FIELD_WIDTH; j++)
+		{
+			if (Field[i][j] != E_BLOCK_WALL)
+			{
+				DrawGraph(j * BLOCK_SIZE, i * BLOCK_SIZE, BlockImage[Field[i][j]],
+					TRUE);
+			}
+		}
+	}
+	//次のブロックとストックされてブロックを描画
+	for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+	{
+		for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+		{
+			//次のブロックを描画
+			DrawGraph(BLOCK_SIZE * j + BLOCK_NEXT_POS_X, BLOCK_SIZE * i +
+				BLOCK_NEXT_POS_Y, BlockImage[Next[i][j]], TRUE);
+			//ストックされてたブロックを描画
+			DrawGraph(BLOCK_SIZE * j + BLOCK_STOCK_POS_X, BLOCK_SIZE * i +
+				BLOCK_STOCK_POS_Y, BlockImage[Stock[i][j]], TRUE);
+		}
+	}
+	//落ちてくるブロックの描画
+	for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+	{
+		for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+		{
+			DrawGraph((DropBlock_X + j) * BLOCK_SIZE, (DropBlock_Y + i) * BLOCK_SIZE,
+				BlockImage[DropBlock[i][j]], TRUE);
+		}
+	}
+}
+
+/********************************
+*ブロック機能：消したラインの数取得処理
+* 引数：なし
+* 戻り値：消したラインの数
+*********************************/
+int Get_Line(void)
+{
+	return DeleteLine;
+}
+
+/*********************************
+*ブロック機能：フィールド生成処理
+* 引数：なし
+* 戻り値：なし
+**********************************/
+void create_field(void)
+{
+	int i, j;    //ループカウンタ
+
+	//フィールドの生成
+	for (i = 0; i < FIELD_HEIGHT; i++)
+	{
+		//フィールド値の設定
+		for (j = 0; j < FIELD_WIDTH; j++)
+		{
+			//フィールド値の設定
+			if (j == 0 || j == FIELD_WIDTH - 1 || i == FIELD_HEIGHT - 1)
+			{
+				Field[i][j] = E_BLOCK_WALL;    //壁状態にする
+			}
+			else
+			{
+				Field[i][j] = E_BLOCK_EMPTY;   //空状態にする
+			}
+		}
+	}
 }
