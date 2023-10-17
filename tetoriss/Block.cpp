@@ -90,7 +90,7 @@ const int C_BLOCK_TABLE[BLOCK_TYPE_MAX][BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE] = {
 *変数宣言
 **************************/
 int BlockImage[E_BLOCK_IMAGE_MAX];         //ブロック画像
-BLOCK_STATE Field[FIELD_HEIGHT];          //フィールド配列
+BLOCK_STATE Field[FIELD_HEIGHT][FIELD_WIDTH];          //フィールド配列
 BLOCK_STATE Next[BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE];  //待機状態のブロック
 BLOCK_STATE Stock[BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE];   //ストックのブロック
 BLOCK_STATE DropBlock[BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE];  //落ちるブロック
@@ -309,3 +309,31 @@ void create_field(void)
 		}
 	}
 }
+
+
+/********************************
+*ブロック機能：ブロック生成処理
+* 引数：無し
+* 戻り値：無し
+*********************************/ 
+void create_block(void)
+{
+	int i, j;   //ループカウンタ
+	int block_type;  //次に出現させるブロックタイプ
+
+	//次に出現させるブロックの決定する
+	block_type = GetRand(BLOCK_TYPE_MAX - 1);
+
+		//あたら石井ブロックをセット＆次にブロックを生成
+		for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+		{
+			for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+			{
+				DropBlock[i][j] = Next[i][j];
+				Next[i][j] = (BLOCK_STATE)C_BLOCK_TABLE[block_type][i][j];
+			}
+		}
+}
+//出現位置の設定
+DropBlock_X = DROP_BLOCK_INIT_X;
+DropBlock_Y = DROP_BLOCK_INIT_Y;
