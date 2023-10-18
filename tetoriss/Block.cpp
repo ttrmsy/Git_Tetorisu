@@ -333,7 +333,130 @@ void create_block(void)
 				Next[i][j] = (BLOCK_STATE)C_BLOCK_TABLE[block_type][i][j];
 			}
 		}
+		//出現位置の設定
+		DropBlock_X = DROP_BLOCK_INIT_X;
+		DropBlock_Y = DROP_BLOCK_INIT_Y;
+
+
+		// 生成できなかった時、ゲームオーバーに遷移する
+			if (check_overlap(DropBlock_X, DropBlock_Y) == FALSE)
+			{
+				Generate_Flg = FALSE;
+			}
 }
-//出現位置の設定
-DropBlock_X = DROP_BLOCK_INIT_X;
-DropBlock_Y = DROP_BLOCK_INIT_Y;
+
+
+/**************************
+*ブロック機能：ブロックの移動処理
+* 引数：なし
+* 戻り値：なし
+***************************/
+void move_block(void)
+{
+	//左入力時
+	if (GetButtonDown(XINPUT_BUTTON_DPAD_LEFT))
+	{
+		if (check_overlap(DropBlock_X - 1, DropBlock_Y) == TRUE)
+		{
+			DropBlock_X--;
+		}
+	}
+
+	//右入力時
+	if (GetButtonDown(XINPUT_BUTTON_DPAD_RIGHT))
+	{
+		if (check_overlap(DropBlock_X + 1, DropBlock_Y) == TRUE)
+		{
+			DropBlock_X++;
+		}
+	}
+
+	//上入力時（ハードドロップ処理）
+	if (GetButtonDown(XINPUT_BUTTON_DPAD_UP))
+	{
+		if (check_overlap(DropBlock_X, DropBlock_Y + 1) == TRUE)
+		{
+			DropBlock_Y++;
+		}
+	}
+
+
+	//下入力時（ソフトドロップ処理）
+	if (GetButtonDown(XINPUT_BUTTON_DPAD_DOWN))
+	{
+		if (check_overlap(DropBlock_X, DropBlock_Y + 1) == TRUE)
+		{
+			DropBlock_Y++;
+		}
+	}
+}
+
+/****************************************
+*ブロック機能：ストック交換処理
+* 引数：なし
+* 戻り値：なし
+*****************************************/
+void change_block(void)
+{
+	BLOCK_STATE temp[BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE] = { E_BLOCK_EMPTY };  //退避領域
+
+	int i, j;  //ループカウンタ
+
+	//ストック先がからかどうか確認
+	if (Stock_Flg == TRUE)
+	{
+		for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+		{
+			for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+			{
+				temp[i][j] = DropBlock[i][j];
+				DropBlock[i][j] = Stock[i][j];
+				Stock[i][j] = temp[i][j];
+			}
+		}
+	}
+	else
+	{
+		Stock_Flg = TRUE;
+		for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+		{
+			for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+			{
+				Stock[i][j] = DropBlock[i][j];
+			}
+			//新しいブロックの設定次のブロック生成
+			create_block();
+		}
+	}
+}
+
+/******************************
+*ブロック機能：ブロックの交換処理
+* 引数：回転指せる向き（０：時計回り　１：反時計回り）
+********************************/
+void turn_block(int clockwise)
+{
+	BLOCK_STATE temp[BLOCK_TROUT_SIZE][BLOCK_TROUT_SIZE] = { E_BLOCK_EMPTY };   //退避領域
+
+	int i, j;   //ループカウンタ
+
+	do 
+	{
+		if (clockwise == TURN_CROCKWICE)
+		{
+			//ブロックを一時保存する
+			for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+			{
+				for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+				{
+					temp[j][3 - i] = DropBlock[i][j];
+				}
+			}
+		}
+		else
+		{
+			//ブロックを一時保持する
+			for()
+		}
+	}
+}
