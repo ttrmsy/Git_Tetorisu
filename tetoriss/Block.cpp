@@ -433,6 +433,7 @@ void change_block(void)
 /******************************
 *ブロック機能：ブロックの交換処理
 * 引数：回転指せる向き（０：時計回り　１：反時計回り）
+* 戻り値：なし
 ********************************/
 void turn_block(int clockwise)
 {
@@ -456,7 +457,122 @@ void turn_block(int clockwise)
 		else
 		{
 			//ブロックを一時保持する
-			for()
+			for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+			{
+				for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+				{
+					temp[3 - j][i] = DropBlock[i][j];
+				}
+			}
+		}
+
+		//ブロック回転
+		for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+		{
+			for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+			{
+				DropBlock[i][j] = temp[i][j];
+			}
+		}
+
+		//壁側の補正処理
+		if (check_overlap(DropBlock_X, DropBlock_Y)&&DropBlock_X >= E_BLOCK_WALL)
+		{
+			DropBlock_X--;
+		}
+		if (check_overlap(DropBlock_X, DropBlock_Y) && DropBlock_X >= E_BLOCK_EMPTY)
+		{
+			DropBlock_X++;
+		}
+	} while (check_overlap(DropBlock_X, DropBlock_Y) == FALSE);
+	PlaySoundMem(SoundEffect[2], DX_PLAYTYPE_BACK, TRUE);
+}
+
+/****************************************
+*ブロック機能：範囲外チェック処理
+* 引数：落下ブロックの座標（ｘ、ｙ）
+* 戻り値：TRUE(範囲内)、FALSE(範囲外)
+*****************************************/
+int check_overlap(int x, int y)
+{
+	int i, j;     //ループカウンタ
+
+	for (i = 0; i < BLOCK_TROUT_SIZE; i++)
+	{
+		for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+		{
+			if (DropBlock[i][j] != E_BLOCK_EMPTY)
+			{
+				if (Field[i + y][j + x] != E_BLOCK_EMPTY)
+				{
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
+}
+
+/***********************************
+*ブロック機能：着地したブロックを固定済みにする処理
+* 引数：落下ブロックの座標（ｘ、ｙ）
+* 戻り値：なし
+************************************/
+void lock_block(int x, int y)
+{
+	int i, j;   //ループカウンタ
+
+	for (i = 0; j < BLOCK_TROUT_SIZE; i++)
+	{
+		for (j = 0; j < BLOCK_TROUT_SIZE; j++)
+		{
+			if (DropBlock[i][j] != E_BLOCK_EMPTY)
+			{
+				Field[y + i][x + j] = DropBlock[i][j];
+			}
+		}
+	}
+	PlaySoundMem(SoundEffect[1], DX_PLAYTYPE_BACK, TRUE);
+}
+
+/*************************************
+*ブロック機能：ブロックの横一列確認処理
+* 引数：なし
+* 戻り値：なし
+**************************************/
+void check_line(void)
+{
+	int i, j, k;     //ループカウンタ
+
+	for (i = 0; i < FIELD_HEIGHT - 1; i++)
+	{
+		for (j = 1; j < FIELD_WIDTH; j++)
+		{
+			//行の途中が空いているか？
+			if (Field[i][j] == E_BLOCK_EMPTY)
+			{
+				break;
+			}
+		}
+
+		//一列揃っていたら、カウンタを増やし、1段下げる
+		if (j >= FIELD_WIDTH)
+		{
+			if (j >= FIELD_WIDTH)
+			{
+				//カウントを増加
+				DeleteLine++;
+
+				//1段下げる
+				for (k = i; k > 0; k--)
+				{
+					for (j = 1; j < FIELD_WIDTH; j++)
+					{
+						Field[k][j] = Field[k - 1][j];
+					}
+				}
+				PlaySoundMem(SoundEffect[0], DX_PLAYTYPE_BACK,TRUE);
+			}
 		}
 	}
 }
