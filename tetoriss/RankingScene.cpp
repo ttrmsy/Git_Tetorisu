@@ -1,5 +1,5 @@
 #include "RankingScene.h"
-#include "Dxlib.h"
+#include "DxLib.h"
 #include "InputControl.h"
 #include "SceneManager.h"
 
@@ -339,9 +339,9 @@ void ranking_input_name_draw(void)
 
 	}
 
-	DrawFormatStirng(300, 200, Getcolor(255, 255, 255), ">%s", New_Score.name);
+	DrawFormatString(300, 200, GetColor(255, 255, 255), ">%s", New_Score.name);
 	
-	SetFormatSize(20);
+	SetFontSize(20);
 
 	//選択している文字をフォーカスしている
 

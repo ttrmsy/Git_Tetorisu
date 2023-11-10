@@ -271,6 +271,16 @@ void Block_Draw(void)
 		}
 	}
 }
+/********************************
+*ブロック機能：ブロックの生成判定処理
+* 引数：なし
+* 戻り値：TURE(ブロックの生成ができる)、FALSE（生成不可）
+********************************/
+int Get_GenerateFlg(void)
+{
+	return Generate_Flg;
+}
+
 
 /********************************
 *ブロック機能：消したラインの数取得処理
@@ -522,7 +532,7 @@ void lock_block(int x, int y)
 {
 	int i, j;   //ループカウンタ
 
-	for (i = 0; j < BLOCK_TROUT_SIZE; i++)
+	for (i = 0; i < BLOCK_TROUT_SIZE; i++)
 	{
 		for (j = 0; j < BLOCK_TROUT_SIZE; j++)
 		{

@@ -33,7 +33,7 @@ KEY_STATE button_state[XINOUT_BUTTON_MAX]; //各ボタン入力状態
 * 引数：なし
 * 戻り値：なし
 ********************************/
-void InputControl_Initialize(void)
+void InputControl_initialize(void)
 {
 	int i;        //ループカウンタ
 
@@ -114,6 +114,39 @@ void InputControl_Update(void)
 * XINPUT_BUTTON_Y              (15)     //Yボタン
 * 戻り値：TRUE(押されてる),FALSE(押されていない)
 ***********************************/
+int GetButton(int button)
+{
+	int ret = FALSE;
+
+	if (button_state[button == E_CLICK] || button_state[button] == E_PRESS)
+	{
+		ret = TRUE;
+	}
+
+	return ret;
+}
+
+/**********************************
+*入力制御機能：押されているか判定処理
+* 引数：XINPUTのボタン情報
+* XINPUT_BOTTON_DPAD_UP   (0)     //デジタル方向ボタン上
+* XINPUT_BOTTON_DPAD_DOWN    (1)   //デジタル方向ボタン下
+* XINPUT_BOTTON_DPAD_LEFT    (2)   //デジタル方向ボタン左
+* XINPUT_BOTTON_DPAD_RIGHT    (3)   //デジタル方向ボタン右
+* XINPUT_BOTTON_START         (4)   //STARTボタン
+* XINPUT_BOTTON_BACK           (5)   //BACKボタン
+* XINPUT_BOTTON_LEFT_THUMB      (6)  //左スティック押し込み
+* XINPUT_BOTTON_RIGHT_THUMB      (7)  //右スティック押し込み
+* XINPUT_BOTTON_LEFT_SHOULDER     (8)  //LBボタン
+* XINPUT_BOTTON_RIGHT_SHOULDER     (9)   //RBボタン
+* XINPUT_BUTTON_A             (12)    //Aボタン
+* XINPUT_BUTTON_B             (13)    //Bボタン
+* XINPUT_BUTTON_X             (14)     //Xボタン
+* XINPUT_BUTTON_Y              (15)     //Yボタン
+* 戻り値：TRUE(押されてる),FALSE(押した瞬間ではない)
+***********************************/
+
+
 int GetButtonDown(int button)
 {
 	int ret = FALSE;
