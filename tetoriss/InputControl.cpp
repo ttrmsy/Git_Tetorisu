@@ -4,7 +4,7 @@
 /*************************
 *マクロ定義
 **************************/
-#define XINOUT_BUTTON_MAX (16)
+#define XINOUT_BUTTON_MAX (16)   //コントローラーのボタン数
 
 /*****************************
 *型定義
@@ -33,7 +33,7 @@ KEY_STATE button_state[XINOUT_BUTTON_MAX]; //各ボタン入力状態
 * 引数：なし
 * 戻り値：なし
 ********************************/
-void InputControl_initialize(void)
+void InputControl_Initialize(void)
 {
 	int i;        //ループカウンタ
 
@@ -73,7 +73,7 @@ void InputControl_Update(void)
 				button_state[i] = E_PRESS;
 				break;
 			default:
-				button_state[i] = E_CLICK;
+				button_state[i] =E_NONE;
 				break;
 			}
 		}
@@ -83,6 +83,8 @@ void InputControl_Update(void)
 			{
 			case E_NONE:
 			case E_RELEASED:
+				button_state[i] = E_NONE;
+				break;
 				button_state[i] = E_RELEASED;
 				break;
 			default:
@@ -118,7 +120,7 @@ int GetButton(int button)
 {
 	int ret = FALSE;
 
-	if (button_state[button == E_CLICK] || button_state[button] == E_PRESS)
+	if (button_state[button] == E_CLICK || button_state[button] == E_PRESS)
 	{
 		ret = TRUE;
 	}

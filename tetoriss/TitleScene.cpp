@@ -85,7 +85,7 @@ void TitleScene_Update(void)
 				Change_Scene(E_RANKING);
 				break;
 		case 2:
-		defalut:
+		default:
 			Change_Scene(E_END);
 			break;
 		}

@@ -35,10 +35,10 @@ void SceneManager_Initialize(GAME_MODE mode)
 	switch (mode)
 	{
 	case E_TITLE:
-		read_error = TitleScene_Initialize();
+		read_error = TitleScene_Initialize();   //タイトル画面の初期化
 		break;
 	case E_GAMEMAIN:
-			read_error = GameMainScene_Initialize();
+			read_error = GameMainScene_Initialize();  //ゲームメイン画面の初期化
 			break;
 	case E_RANKING:
 		if (game_mode == E_GAMEMAIN)
@@ -54,7 +54,7 @@ void SceneManager_Initialize(GAME_MODE mode)
 		break;
 	case E_END:
 	default:
-		EndScene_Initialize();
+		EndScene_Initialize();    //エンド外面の初期化
 		break;
 	}
 	game_mode = mode;
@@ -105,12 +105,16 @@ void SceneManager_Draw(void)
 	{
 	case E_TITLE:
 		TitleScene_Draw();
+		break;
 
 	case E_GAMEMAIN:
 		GameMainScene_Draw();
+		break;
+
 	case E_RANKING:
 		RankingScene_Draw();
 		break;
+
 	case E_END:
 	default:
 		EndScene_Draw();

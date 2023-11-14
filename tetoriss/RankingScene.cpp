@@ -135,7 +135,7 @@ void Set_RankingMode(int mode)
 * ˆø”F‚È‚µ
 * –ß‚è’lF‚È‚µ
 *********************************************/
-void Set_RankingScene(int score)
+void Set_RankingScore(int score)
 {
 	New_Score.score = score;
 }
@@ -188,7 +188,7 @@ void file_write(void)
 	{
 		for (i = 0; i < RANKING_MAX; i++)
 		{
-			fprintf(fp, "%2d,%[^,],%10d\n", Ranking_Data[i].rank,
+			fprintf(fp, "%2d,%s,%10d\n", Ranking_Data[i].rank,
 				Ranking_Data[i].name, Ranking_Data[i].score);
 		}
 
